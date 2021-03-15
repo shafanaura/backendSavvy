@@ -23,7 +23,12 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/", require("./src/routes/auth.route"));
+app.use(
+  "/",
+  require("./src/routes/auth.route"),
+  require("./src/routes/user.route"),
+  require("./src/routes/chat.route")
+);
 
 app.all("*", (req, res) => {
   return status.ResponseStatus(res, 404, "Endpoint not found");

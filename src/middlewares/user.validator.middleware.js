@@ -18,8 +18,7 @@ exports.createUserSchema = [
 
 exports.validateLogin = [
   check("email")
-    .exists()
-    .withMessage("Email is required")
+    .optional()
     .isEmail()
     .withMessage("Must be a valid email")
     .normalizeEmail(),

@@ -60,3 +60,20 @@ exports.updateUser = (id, data) => {
     );
   });
 };
+
+exports.getUsersCountByCondition = (cond) => {
+  return new Promise((resolve, reject) => {
+    const query = dbConn.query(
+      `
+    SELECT COUNT(name) as totalData FROM
+    ${table} WHERE name LIKE "%${cond.search}%"
+    ORDER BY ${cond.sort} ${cond.order}
+    `,
+      (err, res, field) => {
+        if (err) reject(err);
+        resolve(res);
+      }
+    );
+    console.log(query.sql);
+  });
+};

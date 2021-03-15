@@ -1,5 +1,6 @@
 const multer = require("multer");
 const path = require("path");
+const status = require("../helpers/response.helper");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -38,16 +39,10 @@ const upload = (req, res, next) => {
   uploadUser(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       console.log(multer.MulterError);
-      return res.json({
-        success: false,
-        message: err.message,
-      });
+      return status.ResponseStatus(res, 401, err.message);
     } else if (err) {
       console.log(err);
-      return res.json({
-        success: false,
-        message: "Failed to upload picture!",
-      });
+      return status.ResponseStatus(res, 401, err.message);
     }
     next();
   });
