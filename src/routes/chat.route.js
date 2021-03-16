@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const chatDB = [];
+const chatDB = {};
 
 // mendapatkan pesan dari pengirim
 router.get("/chat/:id", (req, res) => {
@@ -11,6 +11,7 @@ router.get("/chat/:id", (req, res) => {
   }
   let results = null;
   // mengambil list kontak nama pengirim
+
   if (from) {
     results = chatDB[id].filter((o) => o.from === from || o.from === id);
   } else {
@@ -33,8 +34,12 @@ router.post("/chat/:id", (req, res) => {
     from,
     timestamp: new Date().getTime(),
   };
+
+  console.log(chatDB);
   if (!chatDB[id]) {
     chatDB[id] = [];
+  }
+  if (!chatDB[from]) {
     chatDB[from] = [];
   }
   chatDB[id].push(chat);
