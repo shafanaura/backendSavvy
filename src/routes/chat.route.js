@@ -1,6 +1,6 @@
 const router = require("express").Router();
 
-const chatDB = {};
+const chatDB = [];
 
 // mendapatkan pesan dari pengirim
 router.get("/chat/:id", (req, res) => {
@@ -35,6 +35,7 @@ router.post("/chat/:id", (req, res) => {
   };
   if (!chatDB[id]) {
     chatDB[id] = [];
+    chatDB[from] = [];
   }
   chatDB[id].push(chat);
   chatDB[from].push(chat);

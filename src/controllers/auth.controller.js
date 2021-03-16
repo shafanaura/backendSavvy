@@ -4,6 +4,7 @@ const { APP_KEY } = process.env;
 const jwt = require("jsonwebtoken");
 const status = require("../helpers/response.helper");
 const fs = require("fs");
+const { validationResult } = require("express-validator");
 
 exports.login = async (req, res) => {
   try {
@@ -82,7 +83,15 @@ exports.register = async (req, res) => {
         "Register Failed, Email or phone number is already exist"
       );
     }
-  } catch (error) {
+  } catch (err) {
+    console.log(err);
     return status.ResponseStatus(res, 400, "Bad request");
+  }
+};
+
+exports.checkValidation = (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return status.ResponseStatus(res, 400, "Validation Failed", errors);
   }
 };

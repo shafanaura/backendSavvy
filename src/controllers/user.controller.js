@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const status = require("../helpers/response.helper");
 const { APP_URL } = process.env;
 const { validationResult } = require("express-validator");
-const fs = require("fs");
+const qs = require("querystring");
 
 exports.checkExistEmail = async (req, res) => {
   try {
@@ -20,51 +20,14 @@ exports.checkExistEmail = async (req, res) => {
 };
 
 exports.listUsers = async (req, res) => {
-  const cond = { ...req.query };
-  cond.search = cond.search || "";
-  cond.page = Number(cond.page) || 1;
-  cond.limit = Number(cond.limit) || 10;
-  cond.dataLimit = cond.limit * cond.page;
-  cond.offset = (cond.page - 1) * cond.limit;
-  cond.sort = cond.sort || "id";
-  cond.order = cond.order || "ASC";
-
-  const pageInfo = {
-    nextLink: null,
-    prevLink: null,
-    totalData: 0,
-    totalPage: 0,
-    currentPage: 0,
-  };
-
-  const countData = await userModel.getUsersCountByCondition(cond);
-  pageInfo.totalData = countData[0].totalData;
-  pageInfo.totalPage = Math.ceil(pageInfo.totalData / cond.limit);
-  pageInfo.currentPage = cond.page;
-  const nextQuery = qs.stringify({
-    ...req.query,
-    page: cond.page + 1,
-  });
-  const prevQuery = qs.stringify({
-    ...req.query,
-    page: cond.page - 1,
-  });
-  pageInfo.nextLink =
-    cond.page < pageInfo.totalPage
-      ? APP_URL.concat(`users?${nextQuery}`)
-      : null;
-  pageInfo.prevLink =
-    cond.page > 1 ? APP_URL.concat(`users?${prevQuery}`) : null;
-
-  const results = await userModel.getUsersByCondition(cond);
-  if (results) {
-    return status.ResponseStatus(
-      res,
-      200,
-      "List of all users",
-      results,
-      pageInfo
-    );
+  try {
+    const results = await userModel.getAllUsers();
+    if (results) {
+      return status.ResponseStatus(res, 200, "List of all users", results);
+    }
+  } catch (err) {
+    console.log(err);
+    return status.ResponseStatus(res, 400, "Bad Request");
   }
 };
 

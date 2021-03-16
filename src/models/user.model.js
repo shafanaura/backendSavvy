@@ -29,6 +29,16 @@ exports.getUsersByCondition = (cond) => {
   });
 };
 
+exports.getAllUsers = () => {
+  return new Promise((resolve, reject) => {
+    const query = dbConn.query(`SELECT * FROM ${table}`, (err, res, field) => {
+      if (err) reject(err);
+      resolve(res);
+    });
+    console.log(query.sql);
+  });
+};
+
 exports.createUser = (data) => {
   return new Promise((resolve, reject) => {
     dbConn.query(
@@ -65,8 +75,8 @@ exports.getUsersCountByCondition = (cond) => {
   return new Promise((resolve, reject) => {
     const query = dbConn.query(
       `
-    SELECT COUNT(name) as totalData FROM
-    ${table} WHERE name LIKE "%${cond.search}%"
+    SELECT COUNT(fullName) as totalData FROM
+    ${table} WHERE fullName LIKE "%${cond.search}%"
     ORDER BY ${cond.sort} ${cond.order}
     `,
       (err, res, field) => {
