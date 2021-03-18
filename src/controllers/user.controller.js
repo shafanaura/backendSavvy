@@ -32,18 +32,22 @@ exports.listUsers = async (req, res) => {
 };
 
 exports.detailUser = async (req, res) => {
-  const { id } = req.params;
-  const results = await userModel.getUsersById(id);
-  if (results.length > 0) {
-    return status.ResponseStatus(res, 200, "List Detail user", results[0]);
-  } else {
-    return status.ResponseStatus(res, 400, "User not found");
+  try {
+    const { id } = req.userData;
+    const results = await userModel.getUsersById(id);
+    if (results.length > 0) {
+      return status.ResponseStatus(res, 200, "List Detail user", results[0]);
+    } else {
+      return status.ResponseStatus(res, 400, "User not found");
+    }
+  } catch (err) {
+    return status.ResponseStatus(res, 400, err.message);
   }
 };
 
 exports.updateUser = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.userData;
     const { password, ...data } = req.body;
     const salt = await bcrypt.genSalt();
     const initialResult = await userModel.getUsersById(id);

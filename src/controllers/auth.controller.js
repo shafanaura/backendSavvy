@@ -22,7 +22,7 @@ exports.login = async (req, res) => {
           status: true,
           message: "Login successfully",
           token,
-          id: existingUser[0].id,
+          idUser: token.id,
         });
       } else {
         return status.ResponseStatus(
@@ -38,8 +38,8 @@ exports.login = async (req, res) => {
         "Email or phone number is not registered"
       );
     }
-  } catch (error) {
-    return status.ResponseStatus(res, 400, "Bad request");
+  } catch (err) {
+    return status.ResponseStatus(res, 400, err.message);
   }
 };
 
