@@ -4,6 +4,7 @@ const status = require("../helpers/response.helper");
 const { APP_URL } = process.env;
 const { validationResult } = require("express-validator");
 const qs = require("querystring");
+const fs = require("fs");
 
 exports.checkExistEmail = async (req, res) => {
   try {
@@ -21,13 +22,54 @@ exports.checkExistEmail = async (req, res) => {
 
 exports.listUsers = async (req, res) => {
   try {
-    const results = await userModel.getAllUsers();
+    const cond = { ...req.query };
+    cond.search = cond.search || "";
+    cond.page = Number(cond.page) || 1;
+    cond.limit = Number(cond.limit) || 3;
+    cond.dataLimit = cond.limit * cond.page;
+    cond.offset = (cond.page - 1) * cond.limit;
+    cond.sort = cond.sort || "id";
+    cond.order = cond.order || "ASC";
+
+    const pageInfo = {
+      nextLink: null,
+      prevLink: null,
+      totalData: 0,
+      totalPage: 0,
+      currentPage: 0,
+    };
+
+    const countData = await userModel.getUsersCountByCondition(cond);
+    pageInfo.totalData = countData[0].totalData;
+    pageInfo.totalPage = Math.ceil(pageInfo.totalData / cond.limit);
+    pageInfo.currentPage = cond.page;
+    const nextQuery = qs.stringify({
+      ...req.query,
+      page: cond.page + 1,
+    });
+    const prevQuery = qs.stringify({
+      ...req.query,
+      page: cond.page - 1,
+    });
+    pageInfo.nextLink =
+      cond.page < pageInfo.totalPage
+        ? APP_URL.concat(`users?${nextQuery}`)
+        : null;
+    pageInfo.prevLink =
+      cond.page > 1 ? APP_URL.concat(`users?${prevQuery}`) : null;
+
+    const results = await userModel.getUsersByCondition(cond);
     if (results) {
-      return status.ResponseStatus(res, 200, "List of all users", results);
+      return status.ResponseStatus(
+        res,
+        200,
+        "List of all users",
+        results,
+        pageInfo
+      );
     }
   } catch (err) {
-    console.log(err);
-    return status.ResponseStatus(res, 400, "Bad Request");
+    return status.ResponseStatus(res, 400, err.message);
   }
 };
 
@@ -70,9 +112,6 @@ exports.updateUser = async (req, res) => {
       const picture = `${APP_URL}${req.file.destination}/${req.file.filename}`;
       const uploadImage = await userModel.updateUser(id, { picture });
       if (uploadImage.affectedRows > 0) {
-        // if (initialResult[0].picture !== null) {
-        //   fs.unlink(`${initialResult[0].picture}`);
-        // }
         return status.ResponseStatus(
           res,
           200,
@@ -93,7 +132,7 @@ exports.updateUser = async (req, res) => {
     return status.ResponseStatus(res, 400, "Failed to update data");
   } catch (err) {
     console.log(err);
-    return status.ResponseStatus(res, 400, "Bad Request");
+    return status.ResponseStatus(res, 400, err.message);
   }
 };
 
