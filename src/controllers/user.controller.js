@@ -58,7 +58,7 @@ exports.listUsers = async (req, res) => {
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`users?${prevQuery}`) : null;
 
-    const results = await userModel.getUsersByCondition(cond);
+    const results = await userModel.getListUsersByCondition(cond);
     if (results) {
       return status.ResponseStatus(
         res,
@@ -79,6 +79,20 @@ exports.detailUser = async (req, res) => {
     const results = await userModel.getUsersById(id);
     if (results.length > 0) {
       return status.ResponseStatus(res, 200, "List Detail user", results[0]);
+    } else {
+      return status.ResponseStatus(res, 400, "User not found");
+    }
+  } catch (err) {
+    return status.ResponseStatus(res, 400, err.message);
+  }
+};
+
+exports.recipientDetail = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const results = await userModel.getUsersById(id);
+    if (results.length > 0) {
+      return status.ResponseStatus(res, 200, "Recipient detail", results[0]);
     } else {
       return status.ResponseStatus(res, 400, "User not found");
     }

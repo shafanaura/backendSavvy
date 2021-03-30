@@ -5,11 +5,10 @@ const authMiddleware = require("../middlewares/auth.middleware");
 routes
   .route("/chat")
   .post(authMiddleware.authCheck, chatController.createMessage)
-  .get(
-    authMiddleware.authCheck,
-    chatController.listContactChat,
-    chatController.listMessage
-  );
+  .get(authMiddleware.authCheck, chatController.listContactChat);
+routes
+  .route("/chat/:sender_id")
+  .get(authMiddleware.authCheck, chatController.listMessage);
 
 module.exports = routes;
 

@@ -4,10 +4,11 @@ const status = require("../helpers/response.helper");
 exports.createMessage = async (req, res) => {
   try {
     const { id } = req.userData;
-    const data = req.body;
+    const { recipient_id, message } = req.body;
     const chat = {
       sender_id: id,
-      ...data,
+      recipient_id: Number(recipient_id),
+      message: message,
     };
     const results = await chatModel.createMessage(chat);
     console.log(results);
@@ -24,10 +25,16 @@ exports.createMessage = async (req, res) => {
 
 exports.listMessage = async (req, res) => {
   try {
-    const data = req.body;
-    const results = await chatModel.getMessageById(data);
+    const { id } = req.userData;
+    const { sender_id } = req.params;
+    const results = await chatModel.getMessageById(id, sender_id);
     if (results.length > 0) {
-      return status.ResponseStatus(res, 200, "List message", results);
+      return status.ResponseStatus(
+        res,
+        200,
+        "List message from sender",
+        results
+      );
     }
   } catch (err) {
     console.log(err);

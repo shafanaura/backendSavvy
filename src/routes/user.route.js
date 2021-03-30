@@ -13,6 +13,7 @@ routes
     userController.updateUser
   )
   .get(authMiddleware.authCheck, userController.detailUser);
+routes.route("/user/:id").get(userController.recipientDetail);
 routes.route("/users").get(userController.listUsers);
 routes.route("/auth").post(userController.checkExistEmail);
 
