@@ -3,7 +3,7 @@ const chatController = require("../controllers/chat.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 
 routes
-  .route("/chat")
+  .route("/chats")
   .post(authMiddleware.authCheck, chatController.createMessage)
   .get(authMiddleware.authCheck, chatController.listContactChat);
 routes
