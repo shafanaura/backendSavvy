@@ -36,6 +36,23 @@ exports.getChatListById = (id) => {
   });
 };
 
+exports.changeLastChat = (sender_id, recipient_id) => {
+  return new Promise((resolve, reject) => {
+    const query = dbConn.query(
+      `
+      UPDATE ${table} SET isLast = '0'
+      WHERE sender_id=${recipient_id} AND recipient_id=${sender_id}
+      OR recipient_id=${recipient_id} AND sender_id=${sender_id}
+      `,
+      (err, res, field) => {
+        if (err) reject(err);
+        resolve(res);
+      }
+    );
+    console.log(query.sql);
+  });
+};
+
 exports.getMessagesByCondition = (cond) => {
   return new Promise((resolve, reject) => {
     const query = dbConn.query(

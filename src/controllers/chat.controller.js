@@ -10,6 +10,7 @@ exports.createMessage = async (req, res) => {
       recipient_id: Number(recipient_id),
       message: message,
     };
+    chatModel.changeLastChat(id, recipient_id);
     req.socket.emit(id, chat);
     const results = await chatModel.createMessage(chat);
     if (results) {
