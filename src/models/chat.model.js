@@ -22,9 +22,9 @@ exports.getChatListById = (id) => {
   return new Promise((resolve, reject) => {
     const query = dbConn.query(
       `
-      SELECT ${table}.*,users.id AS userId, users.fullName as fullName, users.picture FROM ${table}
+      SELECT ${table}.*,users.id AS userId, users.fullName as senderName, users.picture FROM ${table}
       INNER JOIN users ON users.id = IF (sender_id = ${id}, recipient_id, sender_id) 
-      WHERE sender_id=${id} OR recipient_id=${id}
+      WHERE (sender_id=${id} OR recipient_id=${id}) AND ${table}.isLast = 1
       ORDER BY ${table}.createdAt DESC
       `,
       (err, res, field) => {

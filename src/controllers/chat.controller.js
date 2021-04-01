@@ -47,9 +47,8 @@ exports.listContactChat = async (req, res) => {
   try {
     const { id } = req.userData;
     const results = await chatModel.getChatListById(id);
-    const final = Array.from(new Set(results.map((item) => item.userId)));
-    if (final.length > 0) {
-      return status.ResponseStatus(res, 200, "List Chat History", final);
+    if (results.length > 0) {
+      return status.ResponseStatus(res, 200, "List Chat History", results);
     }
   } catch (err) {
     console.log(err);
