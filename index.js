@@ -8,6 +8,20 @@ const status = require("./src/helpers/response.helper");
 dotenv.config();
 const { APP_PORT } = process.env;
 const app = express();
+const server = require("http").createServer(app);
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+const socket = require("./src/middlewares/socket.middleware");
+
+io.on("connection", () => {
+  console.log("a user connected!");
+});
+
+app.use(socket(io));
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(morgan("dev"));
@@ -33,6 +47,6 @@ app.all("*", (req, res) => {
   return status.ResponseStatus(res, 404, "Endpoint not found");
 });
 
-app.listen(APP_PORT, () => {
+server.listen(APP_PORT, () => {
   console.log(`App listening at http://localhost:${APP_PORT}`);
 });

@@ -10,8 +10,8 @@ exports.createMessage = async (req, res) => {
       recipient_id: Number(recipient_id),
       message: message,
     };
+    req.socket.emit(id, chat);
     const results = await chatModel.createMessage(chat);
-    console.log(results);
     if (results) {
       return status.ResponseStatus(res, 200, "Message created successfully", {
         ...chat,
