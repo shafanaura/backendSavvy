@@ -67,15 +67,15 @@ exports.listMessage = async (req, res) => {
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`chat/${sender_id}?${prevQuery}`) : null;
 
-    const initialResult = await chatModel.getMessageById(id, sender_id);
-    if (initialResult.length > 0) {
-      const results = await chatModel.getListChatsByCondition(cond);
-      if (results) {
+    const results = await chatModel.getListChatsByCondition(cond);
+    if (results.length > 0) {
+      const initialResult = await chatModel.getMessageById(id, sender_id);
+      if (initialResult) {
         return status.ResponseStatus(
           res,
           200,
           "List of all Chats",
-          results,
+          initialResult,
           pageInfo
         );
       }

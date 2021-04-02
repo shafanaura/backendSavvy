@@ -6,8 +6,8 @@ exports.getMessageById = (recipient_id, sender_id) => {
     const query = dbConn.query(
       `
       SELECT * FROM ${table} 
-      WHERE sender_id=${recipient_id} AND recipient_id=${sender_id}
-      OR recipient_id=${recipient_id} AND sender_id=${sender_id}
+      WHERE (sender_id=${recipient_id} AND recipient_id=${sender_id})
+      OR (recipient_id=${recipient_id} AND sender_id=${sender_id})
       `,
       (err, res, field) => {
         if (err) reject(err);
