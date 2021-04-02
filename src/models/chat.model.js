@@ -139,3 +139,18 @@ exports.getRecipientById = (id) => {
     console.log(query.sql);
   });
 };
+
+exports.getListChatsByCondition = (cond) => {
+  return new Promise((resolve, reject) => {
+    dbConn.query(
+      `SELECT * FROM ${table} m
+			WHERE m.message LIKE "%${cond.search}%"
+			ORDER BY ${cond.sort} ${cond.order} 
+			LIMIT ${cond.dataLimit} OFFSET ${cond.offset}`,
+      (err, res, field) => {
+        if (err) reject(err);
+        resolve(res);
+      }
+    );
+  });
+};
