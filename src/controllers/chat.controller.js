@@ -31,7 +31,7 @@ exports.listMessage = async (req, res) => {
     const cond = { ...req.query };
     cond.search = cond.search || "";
     cond.page = Number(cond.page) || 1;
-    cond.limit = Number(cond.limit) || 2;
+    cond.limit = Number(cond.limit) || 8;
     cond.dataLimit = cond.limit * cond.page;
     cond.offset = (cond.page - 1) * cond.limit;
     cond.sort = cond.sort || "id";
