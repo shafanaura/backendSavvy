@@ -22,10 +22,11 @@ exports.getChatListById = (id) => {
   return new Promise((resolve, reject) => {
     const query = dbConn.query(
       `
-      SELECT ${table}.*,users.id AS userId, users.fullName as senderName, users.picture FROM ${table}
+      SELECT m.*,users.id AS userId, users.fullName as senderName, users.picture 
+      FROM ${table} m
       INNER JOIN users ON users.id = IF (sender_id = ${id}, recipient_id, sender_id) 
-      WHERE (sender_id=${id} OR recipient_id=${id}) AND ${table}.isLast = 1
-      ORDER BY ${table}.createdAt DESC
+      WHERE (sender_id=${id} OR recipient_id=${id}) AND m.isLast = 1
+      ORDER BY m.createdAt DESC
       `,
       (err, res, field) => {
         if (err) reject(err);
@@ -127,6 +128,23 @@ exports.getMessagesCountByCondition = (cond) => {
   });
 };
 
+exports.getChatHistoryCountByCondition = (cond) => {
+  return new Promise((resolve, reject) => {
+    const query = dbConn.query(
+      `
+    SELECT COUNT(isLast = 1) as totalData FROM
+    ${table} WHERE isLast = 1 LIKE "%${cond.search}%"
+    ORDER BY ${cond.sort} ${cond.order}
+    `,
+      (err, res, field) => {
+        if (err) reject(err);
+        resolve(res);
+      }
+    );
+    console.log(query.sql);
+  });
+};
+
 exports.getRecipientById = (id) => {
   return new Promise((resolve, reject) => {
     const query = dbConn.query(
@@ -141,6 +159,21 @@ exports.getRecipientById = (id) => {
 };
 
 exports.getListChatsByCondition = (cond) => {
+  return new Promise((resolve, reject) => {
+    dbConn.query(
+      `SELECT * FROM ${table} m
+			WHERE m.message LIKE "%${cond.search}%"
+			ORDER BY ${cond.sort} ${cond.order} 
+			LIMIT ${cond.dataLimit} OFFSET ${cond.offset}`,
+      (err, res, field) => {
+        if (err) reject(err);
+        resolve(res);
+      }
+    );
+  });
+};
+
+exports.getListHistoryByCondition = (cond) => {
   return new Promise((resolve, reject) => {
     dbConn.query(
       `SELECT * FROM ${table} m

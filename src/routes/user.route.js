@@ -14,7 +14,7 @@ routes
   )
   .get(authMiddleware.authCheck, userController.detailUser);
 routes.route("/user/:id").get(userController.recipientDetail);
-routes.route("/users").get(userController.listUsers);
+routes.route("/users").get(authMiddleware.authCheck, userController.listUsers);
 routes.route("/auth").post(userController.checkExistEmail);
 
 module.exports = routes;
