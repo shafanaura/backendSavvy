@@ -1,13 +1,15 @@
 const dbConn = require("../helpers/db");
 const table = "messages";
 
-exports.getMessageById = (recipient_id, sender_id) => {
+exports.getMessageById = (recipient_id, sender_id, cond) => {
   return new Promise((resolve, reject) => {
     const query = dbConn.query(
       `
       SELECT * FROM ${table} 
-      WHERE (sender_id=${recipient_id} AND recipient_id=${sender_id})
-      OR (recipient_id=${recipient_id} AND sender_id=${sender_id})
+      WHERE ((sender_id=${recipient_id} AND recipient_id=${sender_id})
+      OR (recipient_id=${recipient_id} AND sender_id=${sender_id}))
+      ORDER BY ${cond.sort} ${cond.order}
+      LIMIT ${cond.limit} OFFSET ${cond.offset} 
       `,
       (err, res, field) => {
         if (err) reject(err);
@@ -54,31 +56,6 @@ exports.changeLastChat = (sender_id, recipient_id) => {
   });
 };
 
-exports.getMessagesByCondition = (cond) => {
-  return new Promise((resolve, reject) => {
-    const query = dbConn.query(
-      `SELECT * FROM ${table} WHERE ${Object.keys(cond)
-        .map((item) => `${item}="${cond[item]}"`)
-        .join(" AND ")}`,
-      (err, res, field) => {
-        if (err) reject(err);
-        resolve(res);
-      }
-    );
-    console.log(query.sql);
-  });
-};
-
-exports.getAllMessages = () => {
-  return new Promise((resolve, reject) => {
-    const query = dbConn.query(`SELECT * FROM ${table}`, (err, res, field) => {
-      if (err) reject(err);
-      resolve(res);
-    });
-    console.log(query.sql);
-  });
-};
-
 exports.createMessage = (data) => {
   return new Promise((resolve, reject) => {
     dbConn.query(
@@ -95,28 +72,15 @@ exports.createMessage = (data) => {
   });
 };
 
-exports.updateMessage = (id, data) => {
-  return new Promise((resolve, reject) => {
-    const key = Object.keys(data);
-    const value = Object.values(data);
-    dbConn.query(
-      `UPDATE ${table}
-			SET ${key.map((item, index) => `${item}="${value[index]}"`)}
-			WHERE id=${id}`,
-      (err, res, field) => {
-        if (err) reject(err);
-        resolve(res);
-      }
-    );
-  });
-};
-
-exports.getMessagesCountByCondition = (cond) => {
+exports.getMessagesCountByCondition = (recipient_id, sender_id, cond) => {
   return new Promise((resolve, reject) => {
     const query = dbConn.query(
       `
-    SELECT COUNT(message) as totalData FROM
-    ${table} WHERE message LIKE "%${cond.search}%"
+    SELECT COUNT(id) as totalData 
+    FROM ${table}
+    WHERE ((sender_id=${recipient_id} AND recipient_id=${sender_id})
+    OR (recipient_id=${recipient_id} AND sender_id=${sender_id}))
+    LIKE "%${cond.search}%"
     ORDER BY ${cond.sort} ${cond.order}
     `,
       (err, res, field) => {
@@ -125,65 +89,5 @@ exports.getMessagesCountByCondition = (cond) => {
       }
     );
     console.log(query.sql);
-  });
-};
-
-exports.getChatHistoryCountByCondition = (cond) => {
-  return new Promise((resolve, reject) => {
-    const query = dbConn.query(
-      `
-    SELECT COUNT(isLast = 1) as totalData FROM
-    ${table} WHERE isLast = 1 LIKE "%${cond.search}%"
-    ORDER BY ${cond.sort} ${cond.order}
-    `,
-      (err, res, field) => {
-        if (err) reject(err);
-        resolve(res);
-      }
-    );
-    console.log(query.sql);
-  });
-};
-
-exports.getRecipientById = (id) => {
-  return new Promise((resolve, reject) => {
-    const query = dbConn.query(
-      `SELECT sender_id FROM ${table} WHERE recipient_id=${id}`,
-      (err, res, field) => {
-        if (err) reject(err);
-        resolve(res);
-      }
-    );
-    console.log(query.sql);
-  });
-};
-
-exports.getListChatsByCondition = (cond) => {
-  return new Promise((resolve, reject) => {
-    dbConn.query(
-      `SELECT * FROM ${table} m
-			WHERE m.message LIKE "%${cond.search}%"
-			ORDER BY ${cond.sort} ${cond.order} 
-			LIMIT ${cond.dataLimit} OFFSET ${cond.offset}`,
-      (err, res, field) => {
-        if (err) reject(err);
-        resolve(res);
-      }
-    );
-  });
-};
-
-exports.getListHistoryByCondition = (cond) => {
-  return new Promise((resolve, reject) => {
-    dbConn.query(
-      `SELECT * FROM ${table} m
-			WHERE m.message LIKE "%${cond.search}%"
-			ORDER BY ${cond.sort} ${cond.order} 
-			LIMIT ${cond.dataLimit} OFFSET ${cond.offset}`,
-      (err, res, field) => {
-        if (err) reject(err);
-        resolve(res);
-      }
-    );
   });
 };

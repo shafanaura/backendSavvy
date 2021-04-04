@@ -34,8 +34,8 @@ exports.listMessage = async (req, res) => {
     cond.limit = Number(cond.limit) || 8;
     cond.dataLimit = cond.limit * cond.page;
     cond.offset = (cond.page - 1) * cond.limit;
-    cond.sort = cond.sort || "id";
-    cond.order = cond.order || "ASC";
+    cond.sort = cond.sort || "createdAt";
+    cond.order = cond.order || "DESC";
 
     const { id } = req.userData;
     const { sender_id } = req.params;
@@ -48,7 +48,12 @@ exports.listMessage = async (req, res) => {
       currentPage: 0,
     };
 
-    const countData = await chatModel.getMessagesCountByCondition(cond);
+    const results = await chatModel.getMessageById(id, sender_id, cond);
+    const countData = await chatModel.getMessagesCountByCondition(
+      id,
+      sender_id,
+      cond
+    );
     pageInfo.totalData = countData[0].totalData;
     pageInfo.totalPage = Math.ceil(pageInfo.totalData / cond.limit);
     pageInfo.currentPage = cond.page;
@@ -67,18 +72,14 @@ exports.listMessage = async (req, res) => {
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`chat/${sender_id}?${prevQuery}`) : null;
 
-    const results = await chatModel.getListChatsByCondition(cond);
     if (results.length > 0) {
-      const initialResult = await chatModel.getMessageById(id, sender_id);
-      if (initialResult) {
-        return status.ResponseStatus(
-          res,
-          200,
-          "List of all Chats",
-          initialResult,
-          pageInfo
-        );
-      }
+      return status.ResponseStatus(
+        res,
+        200,
+        "List of all Chats",
+        results,
+        pageInfo
+      );
     }
   } catch (err) {
     return status.ResponseStatus(res, 400, err.message);

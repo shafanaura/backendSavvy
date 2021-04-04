@@ -7,7 +7,6 @@ const storage = multer.diskStorage({
     cb(null, "uploads/user");
   },
   filename: (req, file, cb) => {
-    console.log(file);
     const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(
       null,
@@ -26,7 +25,7 @@ const fileFilter = (req, file, cb) => {
 };
 
 const limits = {
-  fileSize: 2 * 1024 * 1024,
+  fileSize: 1 * 1024 * 1024,
 };
 
 const uploadUser = multer({
