@@ -13,7 +13,7 @@ exports.createMessage = async (req, res) => {
       message: message,
     };
     chatModel.changeLastChat(id, recipient_id);
-    req.socket.emit(id, chat);
+    req.socket.emit(recipient_id, chat);
     const results = await chatModel.createMessage(chat);
     if (results) {
       return status.ResponseStatus(res, 200, "Message created successfully", {
@@ -72,6 +72,7 @@ exports.listMessage = async (req, res) => {
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`chat/${sender_id}?${prevQuery}`) : null;
 
+    req.socket.emit(sender_id, results);
     if (results.length > 0) {
       return status.ResponseStatus(
         res,

@@ -77,6 +77,7 @@ exports.detailUser = async (req, res) => {
   try {
     const { id } = req.userData;
     const results = await userModel.getUsersById(id);
+    req.socket.emit(id, results);
     if (results.length > 0) {
       return status.ResponseStatus(res, 200, "List Detail user", results[0]);
     } else {
@@ -126,12 +127,7 @@ exports.updateUser = async (req, res) => {
       const picture = `${APP_URL}${req.file.destination}/${req.file.filename}`;
       const uploadImage = await userModel.updateUser(id, { picture });
       if (uploadImage.affectedRows > 0) {
-        return status.ResponseStatus(
-          res,
-          200,
-          "Image has been updated",
-          initialResult[0]
-        );
+        return status.ResponseStatus(res, 200, "Image has been updated");
       }
       return status.ResponseStatus(res, 400, "Can't update Image");
     }

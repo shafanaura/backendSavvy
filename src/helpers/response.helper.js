@@ -5,7 +5,7 @@ module.exports = {
       status_code: code,
       message: message,
       results,
-      info: info,
+      pageInfo: info,
     });
   },
 };

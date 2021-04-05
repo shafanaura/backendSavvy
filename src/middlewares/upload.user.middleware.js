@@ -15,7 +15,7 @@ const storage = multer.diskStorage({
   },
 });
 
-const fileFilter = (req, file, cb) => {
+const fileFilter = async (req, file, cb) => {
   const ext = path.extname(file.originalname);
 
   if (ext !== ".png" && ext !== ".jpg" && ext !== ".gif" && ext !== ".jpeg") {
@@ -38,10 +38,10 @@ const upload = (req, res, next) => {
   uploadUser(req, res, (err) => {
     if (err instanceof multer.MulterError) {
       console.log(multer.MulterError);
-      return status.ResponseStatus(res, 401, err.message);
+      return status.ResponseStatus(res, 400, err.message);
     } else if (err) {
       console.log(err);
-      return status.ResponseStatus(res, 401, err.message);
+      return status.ResponseStatus(res, 400, "Failed to upload image");
     }
     next();
   });
