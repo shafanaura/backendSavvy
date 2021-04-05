@@ -28,7 +28,7 @@ exports.listUsers = async (req, res) => {
     cond.limit = Number(cond.limit) || 5;
     cond.dataLimit = cond.limit * cond.page;
     cond.offset = (cond.page - 1) * cond.limit;
-    cond.sort = cond.sort || "id";
+    cond.sort = cond.sort || "fullName";
     cond.order = cond.order || "ASC";
 
     const pageInfo = {
