@@ -139,10 +139,7 @@ exports.updateUser = async (req, res) => {
         if (initialResult[0].picture !== null) {
           fs.unlinkSync(`public/uploads/profile/${initialResult[0].picture}`);
         }
-        return status.ResponseStatus(res, 200, "Image has been updated", {
-          id,
-          picture,
-        });
+        return status.ResponseStatus(res, 200, "Image has been updated");
       }
       return status.ResponseStatus(res, 400, "Can't update Image");
     }
@@ -151,7 +148,6 @@ exports.updateUser = async (req, res) => {
     if (finalResult.affectedRows > 0) {
       return status.ResponseStatus(res, 200, "data successfully updated", {
         ...initialResult[0],
-        ...data,
       });
     }
     return status.ResponseStatus(res, 400, "Failed to update data");

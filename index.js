@@ -22,12 +22,6 @@ io.on("connection", () => {
   console.log("a user connected!");
 });
 
-app.use(socket(io));
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(morgan("dev"));
-app.use(cors("*"));
-
 app.get("/", (req, res) => {
   return res.json({
     success: true,
@@ -48,6 +42,11 @@ app.use(
 app.all("*", (req, res) => {
   return status.ResponseStatus(res, 404, "Endpoint not found");
 });
+app.use(socket(io));
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(morgan("dev"));
+app.use(cors("*"));
 
 server.listen(APP_PORT, () => {
   console.log(`App listening at http://localhost:${APP_PORT}`);

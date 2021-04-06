@@ -6,7 +6,12 @@ const authMiddleware = require("../middlewares/auth.middleware");
 
 routes
   .route("/user")
-  .patch(uploadImage, authMiddleware.authCheck, userController.updateUser)
+  .patch(
+    authMiddleware.authCheck,
+    uploadImage,
+    validator.validationResult,
+    userController.updateUser
+  )
   .get(authMiddleware.authCheck, userController.detailUser);
 routes.route("/user/:id").get(userController.recipientDetail);
 routes.route("/users").get(authMiddleware.authCheck, userController.listUsers);
