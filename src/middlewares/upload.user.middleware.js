@@ -4,14 +4,13 @@ const status = require("../helpers/response.helper");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "uploads/user");
+    cb(null, "public/uploads/profile");
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-    cb(
-      null,
-      file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname)
-    );
+    const fileName = `${file.fieldname}-${Date.now()}${path.extname(
+      file.originalname
+    )}`;
+    cb(null, fileName);
   },
 });
 

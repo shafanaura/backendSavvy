@@ -4,6 +4,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const status = require("./src/helpers/response.helper");
+const path = require("path");
 
 dotenv.config();
 const { APP_PORT } = process.env;
@@ -33,6 +34,8 @@ app.get("/", (req, res) => {
     message: "Backend is running",
   });
 });
+
+app.use(express.static(path.join(__dirname, "./public")));
 
 app.use("/uploads", express.static("uploads"));
 app.use(

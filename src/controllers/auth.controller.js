@@ -45,13 +45,7 @@ exports.login = async (req, res) => {
 
 exports.register = async (req, res) => {
   try {
-    const {
-      email,
-      phoneNumber,
-      password,
-      fullName,
-      picture = "https://t4.ftcdn.net/jpg/03/32/59/65/360_F_332596535_lAdLhf6KzbW6PWXBWeIFTovTii1drkbT.jpg",
-    } = req.body;
+    const { email, phoneNumber, password, ...data } = req.body;
     const condition = phoneNumber
       ? { phoneNumber: phoneNumber }
       : { email: email };
@@ -62,10 +56,9 @@ exports.register = async (req, res) => {
       const encryptedPassword = await bcrypt.hash(password, salt);
       const createUser = await userModel.createUser({
         email,
-        fullName,
         phoneNumber,
         password: encryptedPassword,
-        picture,
+        ...data,
       });
       if (createUser.insertId > 0) {
         return status.ResponseStatus(

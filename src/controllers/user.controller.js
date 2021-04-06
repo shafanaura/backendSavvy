@@ -1,7 +1,7 @@
 const userModel = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const status = require("../helpers/response.helper");
-const { APP_URL } = process.env;
+const { APP_URL, FILE_URL } = process.env;
 const { validationResult } = require("express-validator");
 const qs = require("querystring");
 const fs = require("fs");
@@ -64,7 +64,10 @@ exports.listUsers = async (req, res) => {
         res,
         200,
         "List of all users",
-        results,
+        {
+          ...results[0],
+          picture: `${FILE_URL}${results[0].picture}`,
+        },
         pageInfo
       );
     }
@@ -79,7 +82,10 @@ exports.detailUser = async (req, res) => {
     const results = await userModel.getUsersById(id);
     req.socket.emit(id, results);
     if (results.length > 0) {
-      return status.ResponseStatus(res, 200, "List Detail user", results[0]);
+      return status.ResponseStatus(res, 200, "List Detail user", {
+        ...results[0],
+        picture: `${FILE_URL}${results[0].picture}`,
+      });
     } else {
       return status.ResponseStatus(res, 400, "User not found");
     }
@@ -93,7 +99,10 @@ exports.recipientDetail = async (req, res) => {
     const { id } = req.params;
     const results = await userModel.getUsersById(id);
     if (results.length > 0) {
-      return status.ResponseStatus(res, 200, "Recipient detail", results[0]);
+      return status.ResponseStatus(res, 200, "Recipient detail", {
+        ...results[0],
+        picture: `${FILE_URL}${results[0].picture}`,
+      });
     } else {
       return status.ResponseStatus(res, 400, "User not found");
     }
@@ -124,10 +133,16 @@ exports.updateUser = async (req, res) => {
     }
 
     if (req.file) {
-      const picture = `${APP_URL}${req.file.destination}/${req.file.filename}`;
+      const picture = req.file.filename;
       const uploadImage = await userModel.updateUser(id, { picture });
       if (uploadImage.affectedRows > 0) {
-        return status.ResponseStatus(res, 200, "Image has been updated");
+        if (initialResult[0].picture !== null) {
+          fs.unlinkSync(`public/uploads/profile/${initialResult[0].picture}`);
+        }
+        return status.ResponseStatus(res, 200, "Image has been updated", {
+          id,
+          picture,
+        });
       }
       return status.ResponseStatus(res, 400, "Can't update Image");
     }
