@@ -29,11 +29,11 @@ exports.getUsersByCondition = (cond) => {
   });
 };
 
-exports.getListUsersByCondition = (cond) => {
+exports.getListUsersByCondition = (id, cond) => {
   return new Promise((resolve, reject) => {
     dbConn.query(
       `SELECT * FROM ${table} u
-			WHERE u.fullName LIKE "%${cond.search}%"
+			WHERE u.id != ${id} AND u.fullName LIKE "%${cond.search}%"
 			ORDER BY ${cond.sort} ${cond.order} 
 			LIMIT ${cond.dataLimit} OFFSET ${cond.offset}`,
       (err, res, field) => {
@@ -86,12 +86,12 @@ exports.updateUser = (id, data) => {
   });
 };
 
-exports.getUsersCountByCondition = (cond) => {
+exports.getUsersCountByCondition = (id, cond) => {
   return new Promise((resolve, reject) => {
     const query = dbConn.query(
       `
     SELECT COUNT(fullName) as totalData FROM
-    ${table} WHERE fullName LIKE "%${cond.search}%"
+    ${table} WHERE id != ${id} AND fullName LIKE "%${cond.search}%"
     ORDER BY ${cond.sort} ${cond.order}
     `,
       (err, res, field) => {

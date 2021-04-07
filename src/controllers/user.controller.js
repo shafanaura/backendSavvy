@@ -30,6 +30,7 @@ exports.listUsers = async (req, res) => {
     cond.offset = (cond.page - 1) * cond.limit;
     cond.sort = cond.sort || "fullName";
     cond.order = cond.order || "ASC";
+    const { id } = req.userData;
 
     const pageInfo = {
       nextLink: null,
@@ -39,7 +40,7 @@ exports.listUsers = async (req, res) => {
       currentPage: 0,
     };
 
-    const countData = await userModel.getUsersCountByCondition(cond);
+    const countData = await userModel.getUsersCountByCondition(id, cond);
     pageInfo.totalData = countData[0].totalData;
     pageInfo.totalPage = Math.ceil(pageInfo.totalData / cond.limit);
     pageInfo.currentPage = cond.page;
@@ -58,18 +59,17 @@ exports.listUsers = async (req, res) => {
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`users?${prevQuery}`) : null;
 
-    const results = await userModel.getListUsersByCondition(cond);
-    if (results) {
+    const results = await userModel.getListUsersByCondition(id, cond);
+    if (results.length > 0) {
       return status.ResponseStatus(
         res,
         200,
         "List of all users",
-        {
-          ...results[0],
-          picture: `${FILE_URL}${results[0].picture}`,
-        },
+        results,
         pageInfo
       );
+    } else {
+      return status.ResponseStatus(res, 400, "No user found");
     }
   } catch (err) {
     return status.ResponseStatus(res, 400, err.message);
@@ -84,7 +84,10 @@ exports.detailUser = async (req, res) => {
     if (results.length > 0) {
       return status.ResponseStatus(res, 200, "List Detail user", {
         ...results[0],
-        picture: `${FILE_URL}${results[0].picture}`,
+        picture:
+          results[0].picture === null
+            ? results[0].picture
+            : `${FILE_URL}${results[0].picture}`,
       });
     } else {
       return status.ResponseStatus(res, 400, "User not found");
@@ -101,7 +104,10 @@ exports.recipientDetail = async (req, res) => {
     if (results.length > 0) {
       return status.ResponseStatus(res, 200, "Recipient detail", {
         ...results[0],
-        picture: `${FILE_URL}${results[0].picture}`,
+        picture:
+          results[0].picture === null
+            ? results[0].picture
+            : `${FILE_URL}${results[0].picture}`,
       });
     } else {
       return status.ResponseStatus(res, 400, "User not found");

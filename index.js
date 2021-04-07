@@ -29,6 +29,8 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use(socket(io));
+
 app.use(express.static(path.join(__dirname, "./public")));
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -42,8 +44,6 @@ app.use(
   require("./src/routes/user.route"),
   require("./src/routes/chat.route")
 );
-
-app.use(socket(io));
 
 app.all("*", (req, res) => {
   return status.ResponseStatus(res, 404, "Endpoint not found");
