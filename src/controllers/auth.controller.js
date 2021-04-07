@@ -22,7 +22,6 @@ exports.login = async (req, res) => {
           status: true,
           message: "Login successfully",
           token,
-          idUser: token.id,
         });
       } else {
         return status.ResponseStatus(

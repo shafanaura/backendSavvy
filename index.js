@@ -31,6 +31,10 @@ app.get("/", (req, res) => {
 
 app.use(express.static(path.join(__dirname, "./public")));
 
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(morgan("dev"));
+app.use(cors("*"));
+
 app.use("/uploads", express.static("uploads"));
 app.use(
   "/",
@@ -39,14 +43,11 @@ app.use(
   require("./src/routes/chat.route")
 );
 
+app.use(socket(io));
+
 app.all("*", (req, res) => {
   return status.ResponseStatus(res, 404, "Endpoint not found");
 });
-app.use(socket(io));
-
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(morgan("dev"));
-app.use(cors("*"));
 
 server.listen(APP_PORT, () => {
   console.log(`App listening at http://localhost:${APP_PORT}`);
