@@ -60,7 +60,7 @@ exports.listUsers = async (req, res) => {
       cond.page > 1 ? APP_URL.concat(`users?${prevQuery}`) : null;
 
     const results = await userModel.getListUsersByCondition(id, cond);
-    if (results.length > 0) {
+    if (results) {
       return status.ResponseStatus(
         res,
         200,
@@ -80,7 +80,6 @@ exports.detailUser = async (req, res) => {
   try {
     const { id } = req.userData;
     const results = await userModel.getUsersById(id);
-    req.socket.emit(id, results);
     if (results.length > 0) {
       return status.ResponseStatus(res, 200, "List Detail user", {
         ...results[0],
@@ -152,9 +151,12 @@ exports.updateUser = async (req, res) => {
 
     const finalResult = await userModel.updateUser(id, data);
     if (finalResult.affectedRows > 0) {
-      return status.ResponseStatus(res, 200, "data successfully updated", {
-        ...initialResult[0],
-      });
+      return status.ResponseStatus(
+        res,
+        200,
+        "data successfully updated",
+        initialResult[0]
+      );
     }
     return status.ResponseStatus(res, 400, "Failed to update data");
   } catch (err) {

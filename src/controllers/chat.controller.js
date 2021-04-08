@@ -70,7 +70,7 @@ exports.listMessage = async (req, res) => {
         : null;
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`chat/${sender_id}?${prevQuery}`) : null;
-    req.socket.emit(sender_id, results);
+    req.socket.emit(`MESSAGE_BY_${id}`, results);
     if (results.length > 0) {
       return status.ResponseStatus(
         res,
@@ -125,7 +125,7 @@ exports.listContactChat = async (req, res) => {
         : null;
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`chats?${prevQuery}`) : null;
-
+    req.socket.emit(id, results);
     if (results.length > 0) {
       return status.ResponseStatus(
         res,
