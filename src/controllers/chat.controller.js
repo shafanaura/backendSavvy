@@ -1,7 +1,7 @@
 const chatModel = require("../models/chat.model");
 const status = require("../helpers/response.helper");
 const qs = require("querystring");
-const { APP_URL } = process.env;
+const { APP_URL, FILE_URL } = process.env;
 
 exports.createMessage = async (req, res) => {
   try {
@@ -14,6 +14,7 @@ exports.createMessage = async (req, res) => {
     };
     chatModel.changeLastChat(id, recipient_id);
     const results = await chatModel.createMessage(chat);
+    req.socket.emit(recipient_id, chat);
     if (results) {
       return status.ResponseStatus(res, 200, "Message created successfully", {
         ...chat,
@@ -70,13 +71,18 @@ exports.listMessage = async (req, res) => {
         : null;
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`chat/${sender_id}?${prevQuery}`) : null;
-    req.socket.emit(`MESSAGE_BY_${id}`, results);
+    // req.socket.emit(id, results);
+    const modified = results.map((item) => ({
+      ...item,
+      picture:
+        item.picture === null ? item.picture : FILE_URL.concat(item.picture),
+    }));
     if (results.length > 0) {
       return status.ResponseStatus(
         res,
         200,
         "List of all Chats",
-        results,
+        modified,
         pageInfo
       );
     }
@@ -125,13 +131,17 @@ exports.listContactChat = async (req, res) => {
         : null;
     pageInfo.prevLink =
       cond.page > 1 ? APP_URL.concat(`chats?${prevQuery}`) : null;
-    req.socket.emit(id, results);
+    const modified = results.map((item) => ({
+      ...item,
+      picture:
+        item.picture === null ? item.picture : FILE_URL.concat(item.picture),
+    }));
     if (results.length > 0) {
       return status.ResponseStatus(
         res,
         200,
         "List Chat History",
-        results,
+        modified,
         pageInfo
       );
     }

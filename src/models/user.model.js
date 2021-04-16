@@ -35,7 +35,7 @@ exports.getListUsersByCondition = (id, cond) => {
       `SELECT * FROM ${table} u
 			WHERE u.id != ${id} AND u.fullName LIKE "%${cond.search}%"
 			ORDER BY ${cond.sort} ${cond.order} 
-			LIMIT ${cond.dataLimit} OFFSET ${cond.offset}`,
+			LIMIT ${cond.limit} OFFSET ${cond.offset}`,
       (err, res, field) => {
         if (err) reject(err);
         resolve(res);

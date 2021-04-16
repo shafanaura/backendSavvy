@@ -60,12 +60,17 @@ exports.listUsers = async (req, res) => {
       cond.page > 1 ? APP_URL.concat(`users?${prevQuery}`) : null;
 
     const results = await userModel.getListUsersByCondition(id, cond);
+    const modified = results.map((item) => ({
+      ...item,
+      picture:
+        item.picture === null ? item.picture : FILE_URL.concat(item.picture),
+    }));
     if (results) {
       return status.ResponseStatus(
         res,
         200,
         "List of all users",
-        results,
+        modified,
         pageInfo
       );
     } else {
@@ -117,6 +122,7 @@ exports.recipientDetail = async (req, res) => {
 };
 
 exports.updateUser = async (req, res) => {
+  console.log("update user");
   try {
     const { id } = req.userData;
     const { password, ...data } = req.body;
